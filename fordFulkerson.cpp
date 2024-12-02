@@ -9,92 +9,87 @@ using namespace std;
  
 /* Devuelve true si hay un camino desde la fuente de 's' bajando a 't' en
 gráfico residual. También se llena de los parent [] para almacenar el camino*/
-bool bfs(int rGraph[V][V], int s, int t, int parent[])
-{
+bool bfs(int grafoResidual[V][V], int fuente, int sumidero, int padre[]) {
        // Crear una matriz visitado y marcar todos los vértices como no visitados
-       bool visited[V];
-       memset(visited, 0, sizeof(visited));
- 
+       bool visitado[V];
+       memset(visitado, 0, sizeof(visitado));
+
        // Creación de una cola, vértice fuente encola y marcar vértices fuente
        // como visitado
-       queue <int> q;
-       q.push(s);
-       visited[s] = true;
-       parent[s] = -1;
- 
-       // Standard BFS Loop
-       while (!q.empty())
-       {
-             int u = q.front();
-             q.pop();
- 
-             for (int v=0; v<V; v++)
-             {
-                    if (visited[v]==false && rGraph[u][v] > 0)
-                    {
-                           q.push(v);
-                           parent[v] = u;
-                           visited[v] = true;
-                    }
-             }
+       queue<int> cola;
+       cola.push(fuente);
+       visitado[fuente] = true;
+       padre[fuente] = -1;
+
+       // Bucle estándar de BFS
+       while (!cola.empty()) {
+              int u = cola.front();
+              cola.pop();
+
+              for (int v = 0; v < V; v++) {
+                     if (visitado[v] == false && grafoResidual[u][v] > 0) {
+                            cola.push(v);
+                            padre[v] = u;
+                            visitado[v] = true;
+                     }
+              }
        }
- 
-       //Si llegamos a caer en BFS a partir de la fuente, y luego volver
+
+       // Si llegamos a caer en BFS a partir de la fuente, y luego volver
        // true, else false
-       return (visited[t] == true);
+       return (visitado[sumidero] == true);
 }
  
-// Retorna el maximo flujo de  s a t en el grafico dado
-int fordFulkerson(int graph[V][V], int s, int t)
-{
+// Retorna el maximo flujo de s a t en el grafico dado
+int fordFulkerson(int grafico[V][V], int fuente, int sumidero) {
        int u, v;
- 
+
        // Crear un gráfico residual y llenar la gráfica residual con
-       //capacidades que figuran en el gráfico original como las capacidades residuales
-       //En el gráfico residual
-       int rGraph[V][V]; // Gráfica residual donde rGraph [i] [j]
-       //indica la capacidad residual de borde de i a j (si hay un borde.
-       //Si rGraph [i] [j] es 0, entonces todavía no hay)
-       for (u = 0; u < V; u++)
-             for (v = 0; v < V; v++)
-                    rGraph[u][v] = graph[u][v];
- 
-       int parent[V]; // Esta matriz es llenada por BFS y ruta almacenada
- 
-       int max_flow = 0; // No hay flujo inicialmente
- 
-       // Aumentar el flujo mientras que hay camino desde la fuente al sumidero
-       while (bfs(rGraph, s, t, parent))
-       {
-             // Encuentra capacidad residual mínima de los bordes a lo largo del camino
-             // llenado por BFS. O podemos decir encontrar el flujo máximo
-             // a través de la ruta encontrada.
-             int path_flow = INT_MAX;
-             for (v=t; v!=s; v=parent[v])
-             {
-                    u = parent[v];
-                    path_flow = min(path_flow, rGraph[u][v]);
-             }
- 
-// Actualizar las capacidades residuales de las aristas y las aristas a lo largo de la trayectoria inversa
-             for (v=t; v != s; v=parent[v])
-             {
-                    u = parent[v];
-                    rGraph[u][v] -= path_flow;
-                    rGraph[v][u] += path_flow;
-             }
- 
-             // Add path flow to overall flow
-             max_flow += path_flow;
+       // capacidades que figuran en el gráfico original como las capacidades residuales
+       // En el gráfico residual
+       int graficoResidual[V][V]; // Gráfica residual donde graficoResidual[i][j]
+       // indica la capacidad residual de borde de i a j (si hay un borde.
+       // Si graficoResidual[i][j] es 0, entonces todavía no hay)
+       for (u = 0; u < V; u++) {
+              for (v = 0; v < V; v++) {
+                     graficoResidual[u][v] = grafico[u][v];
+              }
        }
- 
+
+       int padre[V]; // Esta matriz es llenada por BFS y ruta almacenada
+
+       int flujoMaximo = 0; // No hay flujo inicialmente
+
+       // Aumentar el flujo mientras que hay camino desde la fuente al sumidero
+       while (bfs(graficoResidual, fuente, sumidero, padre)) {
+             
+             // Encuentra capacidad residual mínima de los bordes a lo largo del camino
+              // llenado por BFS. O podemos decir encontrar el flujo máximo
+              // a través de la ruta encontrada.
+              int flujoCamino = INT_MAX;
+              for (v = sumidero; v != fuente; v = padre[v]) {
+                     u = padre[v];
+                     flujoCamino = min(flujoCamino, graficoResidual[u][v]);
+              }
+
+              // Actualizar las capacidades residuales de las aristas y las aristas a lo largo de la trayectoria inversa
+              for (v = sumidero; v != fuente; v = padre[v]) {
+                     u = padre[v];
+                     graficoResidual[u][v] -= flujoCamino;
+                     graficoResidual[v][u] += flujoCamino;
+              }
+
+              // Agregar flujo de camino al flujo total
+              flujoMaximo += flujoCamino;
+       }
+
        // Devuelve el flujo total
-       return max_flow;
+       return flujoMaximo;
 }
+
  
 // Programa  Conductor para probar funciones anteriores
-int main()
-{
+int main() {
        // Vamos a crear un gráfico que se muestra en el ejemplo anterior
        int graph[V][V] = { {0, 16, 13, 0, 0, 0}, //c01c02
                            {0, 0, 10, 12, 0, 0}, //c12c13
