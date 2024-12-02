@@ -7,27 +7,27 @@ using namespace std;
 
 const int INF = INT_MAX;
 
-struct Edge {
-    int to, capacity, cost, flow;
-    Edge(int t, int c, int co) : to(t), capacity(c), cost(co), flow(0) {}
+struct Arista {
+    int destino, capacidad, costo, flujo;
+    Arista(int d, int c, int co) : destino(d), capacidad(c), costo(co), flujo(0) {}
 };
 
-class MinCostMaxFlow {
+class FlujoMaximoCostoMinimo {
 public:
-    MinCostMaxFlow(int n) : n(n), adj(n) {}
+    FlujoMaximoCostoMinimo(int nodos) : nodos(nodos), adj(nodos) {}
 
-    void addEdge(int u, int v, int cap, int cost) {
-        adj[u].emplace_back(v, cap, cost);
-        adj[v].emplace_back(u, 0, -cost);  // reverse edge with negative cost
+    void agregarArista(int desde, int hasta, int capacidad, int costo) {
+        adj[desde].emplace_back(hasta, capacidad, costo);  // Agregar arista hacia adelante
+        adj[hasta].emplace_back(desde, 0, -costo);         // Agregar arista inversa con costo negativo
     }
 
-    pair<int, int> minCostMaxFlow(int source, int sink) {
-        int maxFlow = 0, minCost = 0;
+    pair<int, int> flujoMaximoCostoMinimo(int fuente, int sumidero) {
+        int flujoMaximo = 0, costoMinimo = 0;
         while (true) {
-            vector<int> dist(n, INF), parent(n, -1), edgeId(n, -1);
-            dist[source] = 0;
+            vector<int> dist(nodos, INF), padre(nodos, -1), idArista(nodos, -1);
+            dist[fuente] = 0;
             priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-            pq.push({0, source});
+            pq.push({0, fuente});
 
             while (!pq.empty()) {
                 int u = pq.top().second;
@@ -37,59 +37,57 @@ public:
                 if (d > dist[u]) continue;
 
                 for (int i = 0; i < adj[u].size(); i++) {
-                    Edge& e = adj[u][i];
-                    if (e.capacity - e.flow > 0 && dist[u] + e.cost < dist[e.to]) {
-                        dist[e.to] = dist[u] + e.cost;
-                        parent[e.to] = u;
-                        edgeId[e.to] = i;
-                        pq.push({dist[e.to], e.to});
+                    Arista& e = adj[u][i];
+                    if (e.capacidad - e.flujo > 0 && dist[u] + e.costo < dist[e.destino]) {
+                        dist[e.destino] = dist[u] + e.costo;
+                        padre[e.destino] = u;
+                        idArista[e.destino] = i;
+                        pq.push({dist[e.destino], e.destino});
                     }
                 }
             }
 
-            if (dist[sink] == INF) break;  // No augmenting path
+            if (dist[sumidero] == INF) break;  // No hay camino aumentante
 
-            // Find the maximum flow through the path
-            int pathFlow = INF;
-            for (int v = sink; v != source; v = parent[v]) {
-                int u = parent[v];
-                int edgeIndex = edgeId[v];
-                pathFlow = min(pathFlow, adj[u][edgeIndex].capacity - adj[u][edgeIndex].flow);
+            int flujoCamino = INF;
+            for (int v = sumidero; v != fuente; v = padre[v]) {
+                int u = padre[v];
+                int indiceArista = idArista[v];
+                flujoCamino = min(flujoCamino, adj[u][indiceArista].capacidad - adj[u][indiceArista].flujo);
             }
 
-            // Update the flow and cost
-            for (int v = sink; v != source; v = parent[v]) {
-                int u = parent[v];
-                int edgeIndex = edgeId[v];
-                adj[u][edgeIndex].flow += pathFlow;
-                adj[v][edgeIndex ^ 1].flow -= pathFlow;  // reverse edge
+            for (int v = sumidero; v != fuente; v = padre[v]) {
+                int u = padre[v];
+                int indiceArista = idArista[v];
+                adj[u][indiceArista].flujo += flujoCamino;
+                adj[v][indiceArista ^ 1].flujo -= flujoCamino;  // arista inversa
             }
 
-            maxFlow += pathFlow;
-            minCost += pathFlow * dist[sink];
+            flujoMaximo += flujoCamino;
+            costoMinimo += flujoCamino * dist[sumidero];
         }
-        return {maxFlow, minCost};
+        return {flujoMaximo, costoMinimo};
     }
 
 private:
-    int n;
-    vector<vector<Edge>> adj;
+    int nodos;
+    vector<vector<Arista>> adj;
 };
 
 int main() {
-    int n = 4;  // Número de nodos
-    MinCostMaxFlow mcmf(n);
+    int nodos = 4;  // Número de nodos
+    FlujoMaximoCostoMinimo fcm(nodos);
 
-    // Agregar aristas (u, v, capacidad, costo)
-    mcmf.addEdge(0, 1, 3, 1);
-    mcmf.addEdge(0, 2, 2, 2);
-    mcmf.addEdge(1, 2, 1, 1);
-    mcmf.addEdge(1, 3, 2, 3);
-    mcmf.addEdge(2, 3, 3, 1);
+    // Agregar aristas (desde, hasta, capacidad, costo)
+    fcm.agregarArista(0, 1, 3, 1);
+    fcm.agregarArista(0, 2, 2, 2);
+    fcm.agregarArista(1, 2, 1, 1);
+    fcm.agregarArista(1, 3, 2, 3);
+    fcm.agregarArista(2, 3, 3, 1);
 
-    pair<int, int> result = mcmf.minCostMaxFlow(0, 3);
-    cout << "Flujo máximo: " << result.first << endl;
-    cout << "Costo mínimo: " << result.second << endl;
+    pair<int, int> resultado = fcm.flujoMaximoCostoMinimo(0, 3);
+    cout << "Flujo Máximo: " << resultado.first << endl;
+    cout << "Costo Mínimo: " << resultado.second << endl;
 
     return 0;
 }
