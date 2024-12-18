@@ -88,18 +88,29 @@ int fordFulkerson(int grafico[V][V], int fuente, int sumidero) {
 }
 
  
-// Programa  Conductor para probar funciones anteriores
 int main() {
-       // Vamos a crear un gráfico que se muestra en el ejemplo anterior
-       int graph[V][V] = { {0, 16, 13, 0, 0, 0}, //c01c02
-                           {0, 0, 10, 12, 0, 0}, //c12c13
-                           {0, 4, 0, 0, 14, 0}, //c21c24
-                           {0, 0, 9, 0, 0, 20}, //c32c35
-                           {0, 0, 0, 7, 0, 4}, //c43c45
-                           {0, 0, 0, 0, 0, 0}
-                                  };
- 
-       cout << "El flujo máximo posible es: " << fordFulkerson(graph, 0, 5)<<"\n";
- 
-       return 0;
+    // Grafo 1
+    int graph1[V][V] = {
+        {0, 16, 13, 0, 0, 0},
+        {0, 0, 10, 12, 0, 0},
+        {0, 4, 0, 0, 14, 0},
+        {0, 0, 9, 0, 0, 20},
+        {0, 0, 0, 7, 0, 4},
+        {0, 0, 0, 0, 0, 0}
+    };
+
+    // Grafo 2
+    int graph2[V][V] = {
+        {0, 10, 10, 0, 0, 0},
+        {0, 0, 2, 4, 8, 0},
+        {0, 0, 0, 0, 9, 0},
+        {0, 0, 0, 0, 0, 10},
+        {0, 0, 0, 6, 0, 10},
+        {0, 0, 0, 0, 0, 0}
+    };
+
+    cout << "Con Grafo 1, el flujo máximo posible es: " << fordFulkerson(graph1, 0, 5) << "\n";
+    cout << "Con Grafo 2, el flujo máximo posible es: " << fordFulkerson(graph2, 0, 5) << "\n";
+
+    return 0;
 }
