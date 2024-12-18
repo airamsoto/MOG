@@ -23,6 +23,6 @@ Cada algoritmo incluye al menos dos ejemplos resueltos, con sus respectivas ejec
 
 ## Organización del Repositorio
 
-- **Ejecutables**: Están en la carpeta `Ejecutables`, la cual incluye un `.exe` de cada algoritmo para su ejecución.
+- **Ejecutables**: Están en la carpeta [`Ejecutables`](/Ejecutables), la cual incluye un `.exe` de cada algoritmo para su ejecución.
 - **Algoritmos**: Los algoritmos están en la carpeta de `Algoritmos`, la cual incluye el algoritmo de la búsqueda tabú, el algoritmo de Ford-Fulkerson, el del coste mínimo y el algoritmo de balas. Todos los algoritmos están codificados en C++, a excepción del de balas, que está codificado en Python.
 - **Informe**: El informe está incluido directamente en el repositorio, e incluye una breve explicación de cada algoritmo, los conceptos clave, los pasos que sigue el algoritmo y el código, incluyendo también la salida que genera el programa, por último, se incluye la bibliografía utilizada al trabajar en dicho algoritmo.
